@@ -1,4 +1,4 @@
-export default function CPUView({ data }) {
+export default function CPUView({ data, idleCores = [] }) {
   if (!data) return null;
 
   return (
@@ -20,15 +20,18 @@ export default function CPUView({ data }) {
         Per-Core Load
       </div>
       <div className="core-grid">
-        {data.cores.map((usage, idx) => (
-          <div key={idx} className="core-box" title={`Core ${idx}: ${usage}%`}>
-            <div 
-              className={`core-fill ${usage > 85 ? 'high-usage' : ''}`} 
-              style={{ height: `${usage}%` }} 
-            />
-            <span className="core-text">{idx}</span>
-          </div>
-        ))}
+        {data.cores.map((usage, idx) => {
+          const isIdle = idleCores.includes(idx);
+          return (
+            <div key={idx} className="core-box" style={{ opacity: isIdle ? 0.3 : 1, filter: isIdle ? 'grayscale(80%)' : 'none' }} title={`Core ${idx}: ${usage}%\n${isIdle ? 'IDLE' : 'ACTIVE'}`}>
+              <div 
+                className={`core-fill ${usage > 85 ? 'high-usage' : ''}`} 
+                style={{ height: `${usage}%` }} 
+              />
+              <span className="core-text">{idx}</span>
+            </div>
+          )
+        })}
       </div>
     </div>
   );

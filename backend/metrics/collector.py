@@ -171,11 +171,45 @@ def generate_simulated_tasks():
             
     return tasks
 
+def analyze_bottlenecks(cpu_data, gpu_data):
+    cpu_util = cpu_data["overall"]
+    gpu_util = max([g["utilization"] for g in gpu_data]) if gpu_data else 0
+    
+    bottleneck = "None"
+    alert = "System operating optimally."
+    severity = "low"
+    
+    if gpu_util > 90 and cpu_util < 50:
+        bottleneck = "GPU"
+        alert = "Severe GPU Bottleneck. CPU is waiting on graphics compute."
+        severity = "high"
+    elif cpu_util > 85 and gpu_util < 50:
+        bottleneck = "CPU"
+        alert = "CPU Bottleneck. GPU is underutilized while waiting for logic."
+        severity = "high"
+    elif cpu_util > 80 and gpu_util > 80:
+        bottleneck = "Both"
+        alert = "Maximum System Saturation. Hardware is fully utilized."
+        severity = "medium"
+        
+    idle_cores = [i for i, usage in enumerate(cpu_data["cores"]) if usage < 5]
+            
+    return {
+        "bottleneck": bottleneck,
+        "alert": alert,
+        "severity": severity,
+        "idle_cores": idle_cores
+    }
+
 def get_system_metrics():
     # Initial call to cpu_percent might return 0.0, it sets the baseline.
+    cpu_stats = get_cpu_metrics()
+    gpu_stats = get_gpu_metrics()
+    
     return {
         "platform": platform.platform(),
-        "cpu": get_cpu_metrics(),
-        "gpu": get_gpu_metrics(),
-        "tasks": generate_simulated_tasks()
+        "cpu": cpu_stats,
+        "gpu": gpu_stats,
+        "tasks": generate_simulated_tasks(),
+        "analysis": analyze_bottlenecks(cpu_stats, gpu_stats)
     }

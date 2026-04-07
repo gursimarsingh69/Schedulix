@@ -5,6 +5,7 @@ import CPUView from './components/CPUView';
 import GPUView from './components/GPUView';
 import Timeline from './components/Timeline';
 import WorkloadSelector from './components/WorkloadSelector';
+import SystemHealth from './components/SystemHealth';
 
 function App() {
   const [data, setData] = useState(null);
@@ -60,6 +61,8 @@ function App() {
 
       <main>
         <WorkloadSelector />
+        <SystemHealth analysis={data?.analysis} />
+        
         <div className="grid-layout">
           <div className="card">
             <div className="card-header">
@@ -68,7 +71,7 @@ function App() {
                 <span>CPU Metrics</span>
               </div>
             </div>
-            {data?.cpu ? <CPUView data={data.cpu} /> : <div className="metric-label">Waiting for data...</div>}
+            {data?.cpu ? <CPUView data={data.cpu} idleCores={data?.analysis?.idle_cores} /> : <div className="metric-label">Waiting for data...</div>}
           </div>
 
           <div className="card">
