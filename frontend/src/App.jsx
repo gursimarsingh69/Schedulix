@@ -17,7 +17,7 @@ function App() {
 
     const connect = () => {
       ws = new WebSocket('ws://localhost:8000/ws');
-      
+
       ws.onopen = () => {
         setConnected(true);
       };
@@ -26,7 +26,7 @@ function App() {
         try {
           const parsed = JSON.parse(event.data);
           setData(parsed);
-        } catch(e) {
+        } catch (e) {
           console.error("Failed to parse message", e);
         }
       };
@@ -62,7 +62,7 @@ function App() {
       <main>
         <WorkloadSelector />
         <SystemHealth analysis={data?.analysis} />
-        
+
         <div className="grid-layout">
           <div className="card">
             <div className="card-header">
@@ -87,7 +87,7 @@ function App() {
 
         <div className="card full-width">
           <div className="card-header">
-            Execution Timeline Pipeline (Phase 2 Preview)
+            Execution Timeline Pipeline
           </div>
           <Timeline cpuData={data?.cpu} gpuData={data?.gpu} tasks={data?.tasks} />
         </div>
