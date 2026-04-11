@@ -67,17 +67,32 @@ def get_gpu_metrics():
     if HAS_GPU:
         gpus = []
         for i, handle in enumerate(handles):
-            util = pynvml.nvmlDeviceGetUtilizationRates(handle)
-            mem = pynvml.nvmlDeviceGetMemoryInfo(handle)
-            info = pynvml.nvmlDeviceGetName(handle)
-            name = info.decode('utf-8') if isinstance(info, bytes) else info
+            try:
+                util = pynvml.nvmlDeviceGetUtilizationRates(handle)
+                gpu_util = util.gpu
+            except Exception:
+                gpu_util = 0
+                
+            try:
+                mem = pynvml.nvmlDeviceGetMemoryInfo(handle)
+                mem_used = mem.used / (1024 ** 2)
+                mem_total = mem.total / (1024 ** 2)
+            except Exception:
+                mem_used = 0
+                mem_total = 4096  # Mock total memory if it fails
+                
+            try:
+                info = pynvml.nvmlDeviceGetName(handle)
+                name = info.decode('utf-8') if isinstance(info, bytes) else info
+            except Exception:
+                name = f"GPU {i}"
             
             gpus.append({
                 "id": i,
                 "name": name,
-                "utilization": util.gpu,
-                "memory_used": mem.used / (1024 ** 2),
-                "memory_total": mem.total / (1024 ** 2)
+                "utilization": gpu_util,
+                "memory_used": mem_used,
+                "memory_total": mem_total
             })
             
         gpus.append({

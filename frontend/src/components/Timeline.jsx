@@ -8,7 +8,6 @@ export default function Timeline({ cpuData, gpuData, tasks }) {
   useEffect(() => {
     if (!tasks || !containerRef.current) return;
     
-    // Maintain a rolling window of tasks
     const currentTasks = tasksRef.current;
     
     tasks.forEach(t => {
@@ -63,10 +62,8 @@ export default function Timeline({ cpuData, gpuData, tasks }) {
     const chart = svg.select(".chart-group");
     const bars = chart.selectAll(".task-bar").data(currentTasks, d => d.id);
 
-    // Hardcode hex colors to avoid D3 transition CSS variable bugs (which turns them black)
     const getColor = (type) => type === "cpu" ? "#4ab5f8" : "#b373e6";
 
-    // Update existing nodes explicitly so hot reloads or resizing snaps them properly
     bars.style("filter", "none")
         .style("opacity", 0.9)
         .attr("fill", d => getColor(d.type))
